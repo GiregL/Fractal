@@ -1,2 +1,1 @@
-# Fractal
-Fractal Language
+# fractal
