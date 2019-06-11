@@ -1,0 +1,26 @@
+Configuring pretty-simple-2.2.0.1...
+Preprocessing library for pretty-simple-2.2.0.1..
+Building library for pretty-simple-2.2.0.1..
+[1 of 9] Compiling Text.Pretty.Simple.Internal.Color ( src/Text/Pretty/Simple/Internal/Color.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/Color.o )
+[2 of 9] Compiling Text.Pretty.Simple.Internal.Expr ( src/Text/Pretty/Simple/Internal/Expr.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/Expr.o )
+[3 of 9] Compiling Text.Pretty.Simple.Internal.ExprParser ( src/Text/Pretty/Simple/Internal/ExprParser.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/ExprParser.o )
+[4 of 9] Compiling Text.Pretty.Simple.Internal.Output ( src/Text/Pretty/Simple/Internal/Output.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/Output.o )
+[5 of 9] Compiling Text.Pretty.Simple.Internal.ExprToOutput ( src/Text/Pretty/Simple/Internal/ExprToOutput.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/ExprToOutput.o )
+[6 of 9] Compiling Text.Pretty.Simple.Internal.OutputPrinter ( src/Text/Pretty/Simple/Internal/OutputPrinter.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal/OutputPrinter.o )
+[7 of 9] Compiling Text.Pretty.Simple.Internal ( src/Text/Pretty/Simple/Internal.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple/Internal.o )
+[8 of 9] Compiling Text.Pretty.Simple ( src/Text/Pretty/Simple.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Text/Pretty/Simple.o )
+
+[;1msrc/Text/Pretty/Simple.hs:81:1: [;1m[35mwarning:[0m[0m[;1m [[;1m[35m-Wunused-imports[0m[0m[;1m][0m[0m[;1m
+    The import of ‘pack, unpack’
+    from module ‘Data.Text.Lazy’ is redundant[0m[0m
+[;1m[34m   |[0m[0m
+[;1m[34m81 |[0m[0m [;1m[35mimport Data.Text.Lazy (Text, pack, unpack)[0m[0m
+[;1m[34m   |[0m[0m[;1m[35m ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[0m[0m[9 of 9] Compiling Debug.Pretty.Simple ( src/Debug/Pretty/Simple.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/Debug/Pretty/Simple.o )
+Preprocessing executable 'pretty-simple' for pretty-simple-2.2.0.1..
+Building executable 'pretty-simple' for pretty-simple-2.2.0.1..
+[1 of 1] Compiling Main             ( app/Main.hs, .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/pretty-simple/pretty-simple-tmp/Main.o )
+Linking .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/build/pretty-simple/pretty-simple ...
+Installing library in /home/lezoraig/Bureau/Fractal/.stack-work/install/x86_64-linux-tinfo6/lts-13.24/8.6.5/lib/x86_64-linux-ghc-8.6.5/pretty-simple-2.2.0.1-2Y72C3le8svG3S605CoMVK
+Installing executable pretty-simple in /home/lezoraig/Bureau/Fractal/.stack-work/install/x86_64-linux-tinfo6/lts-13.24/8.6.5/bin
+Registering library for pretty-simple-2.2.0.1..

@@ -19,6 +19,9 @@ import Data.Functor.Identity
     Définition de l'AST
 -}
 
+-- | Type représentant un programme en Fractal
+type Program = [Expr]
+
 -- | Type représentant une valeur constante du langage
 data Value
     = IntegerValue Integer
@@ -29,28 +32,27 @@ data Value
     | SymbolValue String
     deriving (Show)
 
--- | Type représentant un identifiant du langage
-type Identifier = String
-
 -- | Type représentant l'arbre syntaxique du langage
 data Expr 
     = Constant Value
     | Quote [Expr]
-    | List Identifier [Expr]
+    | FunctionCall Value [Expr]
+    | IfExpr Expr [Expr] [Expr]             -- If Predicat Then Else
+    | DefineExpr Value [Expr] [Expr]      -- Define nom args body
+    | Action Expr [Expr]                  -- Predicate Action
+    | Cond [Expr]                       -- Série d'Action
+    deriving (Show)
 
+{-
+-- TODO: Finir le pretty printer
 instance Show Expr where
     show = prettyPrint 0
-
-printHelper :: Expr -> String
-printHelper (Constant v) = show v
-printHelper (Quote list) = concatMap show list
-printHelper _ = "Not Implemented Yet"
 
 prettyPrint :: Int -> Expr -> String
 prettyPrint n (Constant v) = (replicate n '\t') ++ show v
 prettyPrint n (Quote q) = concatMap (("\n" ++ replicate (n + 1) '\t') ++) (map show q)
 prettyPrint _ _ = "Not yet implemented"
-
+-}
 
 {-
     Parsers
@@ -115,7 +117,7 @@ boolean = do
 stringP :: Parser Value
 stringP = do
     _ <- char '"'
-    content <- many anyChar
+    content <- many1 $ satisfy (/= '"')
     _ <- char '"'
     return $ StringValue content
 
@@ -137,28 +139,99 @@ value = do
         return res
         where parsers = map try [stringP, charP, double, integer, boolean, symbolP]
 
--- | Parser d'un identifiant du langage
-identifier :: Parser String
-identifier = do
-    fc <- firstChar
-    rest <- many nonFirstChar
-    return (fc:rest)
-    where
-        firstChar = satisfy (\a -> isLetter a || a == '_')
-        nonFirstChar = satisfy (\a -> isDigit a || isLetter a || a == '_' || a == '\'')
-
-
-
 -- | Parser d'un Quote
 -- | Exemple : `'(#True #False #False)`
-
 quote :: Parser Expr
 quote = do
     _ <- string "'("
-    content <- many1 value
+    content <- many1 expr
     _ <- char ')'
-    return $ Quote (valueListToExprList content)
+    return $ Quote content
 
+-- | Parser d'un appel de fonction
+functionCall :: Parser Expr
+functionCall = do
+    _ <- char '('
+    id <- symbolP
+    body <- many1 expr
+    _ <- char ')'
+    return $ FunctionCall id body
+
+-- | Parser d'une condition If
+ifExpr :: Parser Expr
+ifExpr = do
+    _ <- char '('
+    _ <- string "If"
+    whiteSpace
+    _ <- char '('
+    predicate <- expr
+    _ <- char ')'
+    whiteSpace
+    _ <- char '('
+    thenClause <- many expr
+    _ <- char ')'
+    whiteSpace
+    _ <- char '('
+    elseClause <- many expr
+    _ <- char ')'
+    _ <- char ')'
+    return $ IfExpr predicate thenClause elseClause
+
+-- | Parser d'un bloc define
+defineExpr :: Parser Expr
+defineExpr = do
+    _ <- char '('
+    _ <- string "Define"
+    whiteSpace
+    name <- symbolP
+    whiteSpace
+    _ <- char '('
+    params <- many expr
+    _ <- char ')'
+    whiteSpace
+    _ <- char '('
+    body <- many expr
+    _ <- char ')'
+    whiteSpace
+    _ <- char ')'
+    return $ DefineExpr name params body
+
+-- | Parser d'un bloc Cond
+condExpr :: Parser Expr
+condExpr = do
+    _ <- char '('
+    _ <- string "Cond"
+    content <- many1 actions
+    _ <- char ')'
+    return $ Cond content
+    where actions = do
+            whiteSpace
+            _ <- char '('
+            _ <- char '('
+            predicate <- expr
+            _ <- char ')'
+            _ <- char '('
+            action <- many expr
+            _ <- char ')'
+            _ <- char ')'
+            whiteSpace
+            return $ Action predicate action
+
+-- | Parser d'une expression
+expr :: Parser Expr
+expr = do
+    whiteSpace
+    res <- choice $ map try [ifExpr, defineExpr, quote, functionCall, (Constant <$> value)]
+    whiteSpace
+    return res
+
+-- | Parser du programme
+program :: Parser Program
+program = many1 expr
+
+-- | Résultat du Parser
+result :: String -> Either ParseError Program
+result source = parse program "" source
 
 {-
         Utils

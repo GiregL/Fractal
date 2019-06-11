@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a8848e973f67f4203f4b4fa3a5e7fe515be63bca9482873dfb3a4700be409b87
+-- hash: 289390a2dd3132871beb575457ae4575f66495c06958ba6a7e42346318274931
 
 name:           fractal
 version:        0.1.0.0
@@ -35,7 +35,7 @@ library
   build-depends:
       base >=4.7 && <5
     , parsec >=3.1.13
-    , pretty-show >=1.9.5
+    , pretty-simple >=2.2.0.1
   default-language: Haskell2010
 
 executable fractal-exe
@@ -49,7 +49,7 @@ executable fractal-exe
       base >=4.7 && <5
     , fractal
     , parsec >=3.1.13
-    , pretty-show >=1.9.5
+    , pretty-simple >=2.2.0.1
   default-language: Haskell2010
 
 test-suite fractal-test
@@ -64,5 +64,5 @@ test-suite fractal-test
       base >=4.7 && <5
     , fractal
     , parsec >=3.1.13
-    , pretty-show >=1.9.5
+    , pretty-simple >=2.2.0.1
   default-language: Haskell2010
