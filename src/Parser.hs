@@ -14,6 +14,7 @@ import qualified Text.Parsec.Token as Tok
 
 import Data.Char
 import Data.Functor.Identity
+import Data.Type.Equality
 
 {-
     Définition de l'AST
@@ -30,11 +31,29 @@ data Value
     | StringValue String
     | BoolValue Bool
     | SymbolValue String
+    | Null
     deriving (Show)
+
+instance Eq Value where
+    (==) _ Null = True
+    (==) Null _ = True
+    (==) (IntegerValue v) (IntegerValue v2) = v == v2
+    (==) (IntegerValue _) _ = False
+    (==) (DoubleValue v) (DoubleValue v2) = v == v2
+    (==) (DoubleValue _) _ = False
+    (==) (CharValue v) (CharValue v2) = v == v2
+    (==) (CharValue _) _ = False
+    (==) (StringValue v) (StringValue v2) = v == v2
+    (==) (StringValue _) _ = False
+    (==) (BoolValue v) (BoolValue v2) = v == v2
+    (==) (BoolValue _) _ = False
+    (==) (SymbolValue v) (SymbolValue v2) = v == v2
+    (==) (SymbolValue _) _ = False
 
 -- | Type représentant l'arbre syntaxique du langage
 data Expr 
     = Constant Value
+    | Exception String                  -- Cas spécifique, non implémenté dans la syntaxe
     | Quote [Expr]
     | FunctionCall Value [Expr]
     | IfExpr Expr [Expr] [Expr]             -- If Predicat Then Else
@@ -42,6 +61,24 @@ data Expr
     | Action Expr [Expr]                  -- Predicate Action
     | Cond [Expr]                       -- Série d'Action
     deriving (Show)
+
+instance Eq Expr where
+    (==) (Exception _) (Exception _) = True
+    (==) (Exception _) _ = False
+    (==) (Quote _) (Quote _) = True
+    (==) (Quote _) _ = False
+    (==) (Constant v) (Constant v2) = v == v2
+    (==) (Constant _) _ = False
+    (==) (FunctionCall _ _) (FunctionCall _ _) = True
+    (==) (FunctionCall _ _) _ = True
+    (==) (IfExpr _ _ _) (IfExpr _ _ _) = True
+    (==) (IfExpr _ _ _) _ = False
+    (==) (DefineExpr _ _ _) (DefineExpr _ _ _) = True
+    (==) (DefineExpr _ _ _) _ = False
+    (==) (Action _ _) (Action _ _) = True
+    (==) (Action _ _) _ = False
+    (==) (Cond _) (Cond _) = True
+    (==) (Cond _) _ = False
 
 {-
 -- TODO: Finir le pretty printer
@@ -242,6 +279,9 @@ lineComment = do
     skipMany $ noneOf "\r\n\0"
     whiteSpace
     return ()
+
+skipComments :: Parser ()
+skipComments = skipMany lineComment
 
 -- | Parser d'une expression
 expr :: Parser Expr

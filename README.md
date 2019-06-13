@@ -27,3 +27,15 @@ If expression :
   (print "False")
 })
 ```
+
+Define names and functions
+
+```lisp
+(Define functionName [arg1 arg2 arg3] {
+  (print arg1 arg2 arg3)
+})
+```
+
+```lisp
+(Define name [] { '("some" "values") })
+```
