@@ -38,7 +38,7 @@ data Expr
     | Quote [Expr]
     | FunctionCall Value [Expr]
     | IfExpr Expr [Expr] [Expr]             -- If Predicat Then Else
-    | DefineExpr Value [Expr] [Expr]      -- Define nom args body
+    | DefineExpr Value [Value] [Expr]      -- Define nom args body
     | Action Expr [Expr]                  -- Predicate Action
     | Cond [Expr]                       -- Série d'Action
     deriving (Show)
@@ -92,12 +92,11 @@ double = negDouble <|> posDouble
             rem <- num
             return $ DoubleValue (read (posPart ++ [sep] ++ rem) :: Double)
 
-
 -- | Parser d'un Char
 charP :: Parser Value
 charP = do
     _ <- char '\''
-    c <- anyChar
+    c <- noneOf "'"
     _ <- char '\''
     return $ CharValue c
 
@@ -127,8 +126,8 @@ symbolP = do
     f <- firstLetter
     r <- rest
     return $ SymbolValue (f:r)
-    where firstLetter = letter <|> oneOf "_?!"
-          rest = many (letter <|> digit <|> oneOf "_?!") 
+    where firstLetter = letter <|> oneOf "_?!+-*/%"
+          rest = many (letter <|> digit <|> oneOf "_?!+-*/%") 
 
 -- | Parser d'une Value
 value :: Parser Value
@@ -161,66 +160,94 @@ functionCall = do
 ifExpr :: Parser Expr
 ifExpr = do
     _ <- char '('
+    whiteSpace
     _ <- string "If"
     whiteSpace
-    _ <- char '('
+    _ <- char '['
     predicate <- expr
-    _ <- char ')'
+    _ <- char ']'
     whiteSpace
-    _ <- char '('
+    _ <- char '{'
     thenClause <- many expr
+    _ <- char '}'
+    whiteSpace
+    _ <- char '{'
+    elseClause <- many expr
+    _ <- char '}'
+    whiteSpace
     _ <- char ')'
     whiteSpace
-    _ <- char '('
-    elseClause <- many expr
-    _ <- char ')'
-    _ <- char ')'
     return $ IfExpr predicate thenClause elseClause
 
 -- | Parser d'un bloc define
 defineExpr :: Parser Expr
 defineExpr = do
     _ <- char '('
+    whiteSpace
     _ <- string "Define"
     whiteSpace
     name <- symbolP
     whiteSpace
-    _ <- char '('
-    params <- many expr
-    _ <- char ')'
+    _ <- char '['
+    params <- many symbolP
+    _ <- char ']'
     whiteSpace
-    _ <- char '('
+    _ <- char '{'
+    whiteSpace
     body <- many expr
-    _ <- char ')'
+    whiteSpace
+    _ <- char '}'
     whiteSpace
     _ <- char ')'
+    whiteSpace
     return $ DefineExpr name params body
 
 -- | Parser d'un bloc Cond
 condExpr :: Parser Expr
 condExpr = do
     _ <- char '('
+    whiteSpace
     _ <- string "Cond"
+    whiteSpace
     content <- many1 actions
+    whiteSpace
     _ <- char ')'
+    whiteSpace
     return $ Cond content
     where actions = do
             whiteSpace
             _ <- char '('
-            _ <- char '('
+            whiteSpace
+            _ <- char '['
+            whiteSpace
             predicate <- expr
-            _ <- char ')'
-            _ <- char '('
+            whiteSpace
+            _ <- char ']'
+            whiteSpace
+            _ <- char '{'
+            whiteSpace
             action <- many expr
-            _ <- char ')'
+            whiteSpace
+            _ <- char '}'
+            whiteSpace
             _ <- char ')'
             whiteSpace
             return $ Action predicate action
+
+-- | Parser d'un commentaire uniligne
+lineComment :: Parser ()
+lineComment = do
+    string "--"
+    whiteSpace
+    skipMany $ noneOf "\r\n\0"
+    whiteSpace
+    return ()
 
 -- | Parser d'une expression
 expr :: Parser Expr
 expr = do
     whiteSpace
+    skipMany lineComment
     res <- choice $ map try [ifExpr, defineExpr, quote, functionCall, (Constant <$> value)]
     whiteSpace
     return res
@@ -231,7 +258,7 @@ program = many1 expr
 
 -- | Résultat du Parser
 result :: String -> Either ParseError Program
-result source = parse program "" source
+result = parse program ""
 
 {-
         Utils

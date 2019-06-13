@@ -1,1 +1,5 @@
-'(mdr pute lol qdzqzd '(fils de pute de laink))
+-- Simple commentary
+
+(print "hello" "world")
+-- Un autre commentaire
+(+ (* 5 2) 3)
