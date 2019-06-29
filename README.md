@@ -10,6 +10,7 @@ Don't forget that I make this project in order to learn Haskell. My code isn't a
 ## Syntax exemples
 
 Basic expressions :
+**All of these will change**
 
 ```lisp
 -- Simple commentary
